@@ -9,6 +9,8 @@ function osrelease () {
         echo "AMZN"
     elif [ "$OS" == "CentOS Linux" ]; then
         echo "CentOS"
+    elif [ "$OS" == "Red Hat Enterprise Linux Server" ]; then
+        echo "RHEL"
     else
         echo "Operating System Not Found"
     fi
@@ -21,7 +23,14 @@ function vgname () {
 vg=$(vgname)
 release=$(osrelease)
 
-if [ "$release" == "CentOS" ]; then
+if [ "$release" == "RHEL" ]; then
+	echo -e "n\np\n\n\n\nt\n\n8e\nw" | fdisk /dev/sda
+    partprobe
+	pvcreate /dev/sda3
+	vgextend $vg /dev/sda3
+	lvextend -l +100%FREE /dev/$vg/root
+	xfs_growfs /dev/$vg/root
+elif [ "$release" == "CentOS" ]; then
 	echo -e "n\np\n\n\n\nt\n\n8e\nw" | fdisk /dev/sda
     partprobe
 	pvcreate /dev/sda3
